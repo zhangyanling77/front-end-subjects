@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>封装lightBox组件</title>
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/plugins.css">
+</head>
+<body>
+	<!-- html部分 -->
+	<section id="Contrl">
+		<section id="ImgBox"></section>
+		<section id="layer"></section>
+		<section id="lightBox">
+			<figure>
+				<img src="image/1.jpg" alt="">
+				<figcaption>birds</figcaption>
+			</figure>
+			<section id="close"><span class="fa fa-close"></span></section>
+			<section id="page">
+				<span>1</span>/6
+			</section>
+			<section id="prev"><span class="fa fa-chevron-left"></span></section>
+			<section id="next"><span class="fa fa-chevron-right"></span></section>
+		</section>
+	</section>
+	
+	<!-- js部分 -->
+	<script src="js/jquery-2.1.1.min.js"></script>
+	<script>
+		var oImg=["image/1.jpg","image/2.jpg","image/3.jpg","image/4.jpg","image/5.jpg","image/6.jpg"];
+		var oWords=["birds","fish","butterfly","flower","hen","bee"];
+		$(function(){
+			$("#Contrl").lightBox();
+		});
+		//自己扩展的lightBox方法
+		$.fn.lightBox=function(){
+			$("#ImgBox").html("");
+			for(var i=0;i<oImg.length;i++){
+				$("#ImgBox").html($("#ImgBox").html()+
+					"<figure><img src='"+oImg[i]+"'><figcaption>"+oWords[i]+
+					"</figcaption></figure>");
+			};
+			$("#ImgBox>figure").click(function(e){
+				var target=e.target || e.srcElement;
+				$("#lightBox>figure>img")[0].src="";
+				$("#lightBox>figure>img")[0].src=target.src;
+				console.log(target)
+				var index=(target.src).charAt((target.src).lastIndexOf("/")+1);
+				console.log(index)
+				if(index==1){
+					$("#next").css("display","block");
+					$("#prev").css("display","none");
+				}else if(index==6){
+					$("#next").css("display","none");
+					$("#prev").css("display","block");
+				}else{
+					$("#next").css("display","block");
+					$("#prev").css("display","block");
+				}
+				$("#page>span").html(index);
+				$("#lightBox>figure>figcaption").text(oWords[index-1]);
+				$(this).showCarousel();
+			});
+			$("#close").click(function(){
+				$(this).closeBox();
+			});
+			$("#prev").click(function(){
+				$(this).prevImg();
+			});
+			$("#next").click(function(){
+				$(this).nextImg();
+			});
+		};
+		// 自己扩展方法
+		$.fn.extend({
+			//打开lightBox
+			showCarousel:function(){
+				$("#layer").css("display","block");
+				$("#lightBox").css({
+					display:"block"
+				});
+			},
+			//关闭lightBox
+			closeBox:function(){
+				$("#layer").css("display","none");
+				$("#lightBox").css({
+					display:"none"
+				})
+			},
+			//上一张
+			prevImg:function(){
+				var targ=$("#lightBox>figure>img")[0];
+				var index=(targ.src).charAt((targ.src).lastIndexOf("/")+1);
+				$("#lightBox>figure>img")[0].setAttribute("src",oImg[index-2]);
+				index--;
+				$("#page>span").html(index);
+				$("#lightBox>figure>figcaption").text(oWords[index-1]);
+				if(index!=1){
+					$("#prev").css("display","block");
+					$("#next").css("display","block");
+				}else{
+					$("#prev").css("display","none");
+					$("#next").css("display","block");
+				}
+			},
+			//下一张
+			nextImg:function(){
+				var targ=$("#lightBox>figure>img")[0];
+				var index=(targ.src).charAt((targ.src).lastIndexOf("/")+1);
+				$("#lightBox>figure>img")[0].setAttribute("src",oImg[index]);
+				index++;
+				$("#page>span").html(index);
+				$("#lightBox>figure>figcaption").text(oWords[index-1]);
+				if(index!=6){
+					$("#next").css("display","block");
+					$("#prev").css("display","block");
+				}else{
+					$("#next").css("display","none");
+					$("#prev").css("display","block");
+				}
+			}
+		});
+	</script>
+</body>
+</html>
